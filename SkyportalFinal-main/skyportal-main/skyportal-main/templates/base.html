@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- block title lets each page set its own tab title -->
+    <title>{% block title %}Sky Engineering Portal{% endblock %}</title>
+
+    <!-- Bootstrap for layout and utility classes -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Syne for headings, DM Sans for body text -->
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons for all the icons used throughout the site -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        /* CSS variables so I can reuse the Sky colour palette everywhere */
+        :root {
+            --sky-blue: #0072CE;
+            --sky-dark: #003D7A;
+            --sky-accent: #00B5E2;
+            --sky-light: #E8F4FD;
+            --border: #D6E4F0;
+            --text-dark: #0D1B2A;
+            --text-muted: #5A7184;
+            --danger: #DE350B;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* flex column so the footer always sticks to the bottom */
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #F0F6FC;
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3, h4, h5 { font-family: 'Syne', sans-serif; }
+
+        /* NAVBAR */
+        .sky-navbar {
+            background: var(--sky-dark);
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 12px rgba(0,61,122,0.18);
+            /* sticky so it stays visible when scrolling */
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .sky-navbar .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .sky-logo {
+            width: 38px; height: 38px;
+            background: var(--sky-accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            color: white;
+        }
+
+        .brand-text {
+            color: white;
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .brand-text span { color: var(--sky-accent); }
+
+        .nav-links { display: flex; align-items: center; gap: 6px; }
+
+        .nav-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            padding: 6px 13px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover { background: rgba(255,255,255,0.1); color: white; }
+
+        /* Accent button used for Sign Up in the navbar */
+        .nav-links .btn-accent {
+            background: var(--sky-accent);
+            color: white;
+            font-weight: 600;
+        }
+
+        .nav-links .btn-accent:hover { background: #0099C2; }
+
+        /* MESSAGES - Django flash messages shown after actions like login/logout */
+        .msg-wrap { max-width: 1100px; margin: 16px auto 0; padding: 0 1.5rem; }
+
+        .alert {
+            border: none;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            padding: 11px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* MAIN & FOOTER */
+        main { flex: 1; }
+
+        footer {
+            background: var(--sky-dark);
+            color: rgba(255,255,255,0.55);
+            text-align: center;
+            padding: 18px;
+            font-size: 0.8rem;
+        }
+
+        footer span { color: var(--sky-accent); }
+    </style>
+    <!-- block extra_css lets child templates add their own styles -->
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- Navbar - shows different links depending on whether the user is logged in -->
+<nav class="sky-navbar">
+    <a href="{% url 'home' %}" class="brand">
+        <!-- Sky logo text with gradient to match the brand -->
+        <span style="font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 900; background: linear-gradient(135deg, #FF6B35, #F0008C, #7B2FBE); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">sky</span>
+        <span class="brand-text"><span>Engineering</span> Portal</span>
+    </a>
+    <div class="nav-links">
+        <!-- Show Dashboard/Logout if logged in, otherwise show Log In/Sign Up -->
+        {% if user.is_authenticated %}
+            <a href="{% url 'home' %}"><i class="bi bi-grid me-1"></i>Dashboard</a>
+            <a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-1"></i>Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}">Log In</a>
+            <a href="{% url 'register' %}" class="btn-accent">Sign Up</a>
+        {% endif %}
+    </div>
+</nav>
+
+<main>
+    <!-- Django messages - shown after login, logout, errors etc -->
+    {% if messages %}
+    <div class="msg-wrap">
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+            <!-- Pick the right icon depending on message type -->
+            <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Each page fills this block with its own content -->
+    {% block content %}{% endblock %}
+</main>
+
+<footer>
+    &copy; 2026 <span>Sky Engineering Portal</span> &mdash; University of Westminster · 5COSC021W
+</footer>
+
+<!-- Bootstrap JS for the dismissible alert messages -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

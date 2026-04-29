@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h1>Teams</h1>
+    <p>Search for engineering teams, departments, managers, skills or members.</p>
+
+    <form method="get" class="mb-4">
+        <input 
+            type="text" 
+            name="q" 
+            value="{{ query }}" 
+            placeholder="Search teams, managers, departments, skills or members..."
+            class="form-control"
+        >
+
+        <button type="submit" class="btn btn-primary mt-2">Search</button>
+    </form>
+
+    {% if teams %}
+        {% for team in teams %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h3>{{ team.team_name }}</h3>
+
+                    <p><strong>Department:</strong> {{ team.department }}</p>
+                    <p><strong>Manager:</strong> {{ team.team_leader }}</p>
+                    <p><strong>Team type:</strong> {{ team.team_type }}</p>
+
+                    <a href="{% url 'team_detail' team.id %}" class="btn btn-outline-primary">
+                        View Details
+                    </a>
+
+                    {% if team.contact_email %}
+                        <a href="mailto:{{ team.contact_email }}" class="btn btn-outline-secondary">
+                            Email Team
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No teams found.</p>
+    {% endif %}
+
+</div>
+{% endblock %}

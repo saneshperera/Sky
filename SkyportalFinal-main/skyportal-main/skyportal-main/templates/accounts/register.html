@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% block title %}Register – Sky Engineering Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Centred layout for the register form */
+    .register-page {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 1rem;
+        background: #F2F2F2;
+    }
+
+    .register-box {
+        width: 100%;
+        max-width: 420px;
+    }
+
+    /* Header above the card */
+    .register-header {
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .register-header h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #001937;
+        margin-bottom: 6px;
+    }
+
+    .register-header p {
+        color: #7A9AB5;
+        font-size: 0.88rem;
+    }
+
+    /* White card that holds the form */
+    .register-card {
+        background: white;
+        border: 1px solid #C8DFF0;
+        border-radius: 12px;
+        padding: 36px;
+        box-shadow: 0 4px 20px rgba(0, 25, 55, 0.08);
+    }
+
+    .field {
+        margin-bottom: 18px;
+    }
+
+    label {
+        display: block;
+        font-weight: 600;
+        font-size: 0.83rem;
+        color: #201F1E;
+        margin-bottom: 6px;
+    }
+
+    /* Relative position so the icon can sit inside the input */
+    .input-wrap {
+        position: relative;
+    }
+
+    .input-wrap .ico {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #7A9AB5;
+        font-size: 0.95rem;
+    }
+
+    /* email added here so it gets the same styling as text and password inputs */
+    input[type="text"],
+    input[type="password"],
+    input[type="email"] {
+        width: 100%;
+        padding: 11px 14px 11px 38px; /* left padding for the icon */
+        border: 1.5px solid #C8DFF0;
+        border-radius: 7px;
+        font-size: 0.9rem;
+        color: #201F1E;
+        background: #F2F2F2;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        font-family: 'Inter', sans-serif;
+    }
+
+    input:focus {
+        border-color: #00558C;
+        box-shadow: 0 0 0 3px rgba(0, 85, 140, 0.1);
+        background: white;
+    }
+
+    /* Small helper text shown under fields */
+    .hint {
+        font-size: 0.74rem;
+        color: #7A9AB5;
+        margin-top: 4px;
+    }
+
+    /* Red validation errors from Django */
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 5px 0 0;
+        color: #C0392B;
+        font-size: 0.78rem;
+    }
+
+    /* Pink register button */
+    .btn-register {
+        width: 100%;
+        padding: 12px;
+        background: #F0008C;
+        color: white;
+        border: none;
+        border-radius: 7px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-top: 4px;
+    }
+
+    .btn-register:hover {
+        background: #001937;
+    }
+
+    /* Link back to login page */
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 16px;
+        font-size: 0.85rem;
+        color: #00558C;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-page">
+    <div class="register-box">
+
+        <div class="register-header">
+            <h1>Create Account</h1>
+            <p>Join the Sky Engineering Portal</p>
+        </div>
+
+        <div class="register-card">
+            <!-- novalidate stops browser validation, Django handles it instead -->
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <!-- Username field -->
+                <div class="field">
+                    <label for="id_username">Username</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-person ico"></i>
+                        <input type="text" name="username" id="id_username" placeholder="Choose a username"
+                            value="{{ form.username.value|default:'' }}" autocomplete="username">
+                    </div>
+
+                    <!-- Email field - added manually since Django's default form doesn't include it -->
+                    <div class="field">
+                        <label for="id_email">Email Address</label>
+                        <div class="input-wrap">
+                            <i class="bi bi-envelope ico"></i>
+                            <input type="email" name="email" id="id_email"
+                                class="{% if form.email.errors %}invalid{% endif %}"
+                                placeholder="Enter your email address" value="{{ form.email.value|default:'' }}"
+                                autocomplete="email">
+                        </div>
+                        {% if form.email.errors %}
+                        <ul class="errorlist">{% for e in form.email.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+                        {% endif %}
+                        <div class="hint">Letters, digits and @/./+/-/_ only</div>
+                    </div>
+                </div>
+
+                <!-- Password field with hint about requirements -->
+                <div class="field">
+                    <label for="id_password1">Password</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-lock ico"></i>
+                        <input type="password" name="password1" id="id_password1" placeholder="Create a password"
+                            autocomplete="new-password">
+                    </div>
+                    <div class="hint">At least 8 characters, cannot be entirely numeric</div>
+                    {% if form.password1.errors %}
+                    <ul class="errorlist">{% for e in form.password1.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+
+                <!-- Confirm password field -->
+                <div class="field">
+                    <label for="id_password2">Confirm Password</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-lock-fill ico"></i>
+                        <input type="password" name="password2" id="id_password2" placeholder="Repeat your password"
+                            autocomplete="new-password">
+                    </div>
+                    {% if form.password2.errors %}
+                    <ul class="errorlist">{% for e in form.password2.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn-register">Register</button>
+            </form>
+
+            <a href="{% url 'login' %}" class="back-link">
+                ← Back to Login
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

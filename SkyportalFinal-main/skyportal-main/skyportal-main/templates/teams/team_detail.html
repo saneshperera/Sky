@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <a href="{% url 'team_list' %}" class="btn btn-link">&larr; Back to Teams</a>
+
+    <h1>{{ team.team_name }}</h1>
+    <p><strong>Department:</strong> {{ team.department }}</p>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h3>Team Overview</h3>
+            <p><strong>Mission:</strong> {{ team.mission }}</p>
+            <p><strong>Responsibilities:</strong> {{ team.responsibilities }}</p>
+            <p><strong>Skills:</strong> {{ team.skills }}</p>
+            <p><strong>Manager:</strong> {{ team.team_leader }}</p>
+            <p><strong>Department Head:</strong> {{ team.department_head }}</p>
+            <p><strong>Team Type:</strong> {{ team.team_type }}</p>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h3>Contact and Links</h3>
+            <p><strong>Email:</strong> {{ team.contact_email }}</p>
+            <p><strong>Slack/Teams Channel:</strong> {{ team.slack_channel }}</p>
+
+            {% if team.code_repository %}
+                <p><strong>Repository:</strong> 
+                    <a href="{{ team.code_repository }}" target="_blank">{{ team.code_repository }}</a>
+                </p>
+            {% endif %}
+
+            {% if team.jira_board %}
+                <p><strong>Jira Board:</strong> 
+                    <a href="{{ team.jira_board }}" target="_blank">{{ team.jira_board }}</a>
+                </p>
+            {% endif %}
+
+            {% if team.wiki_page %}
+                <p><strong>Wiki Page:</strong> 
+                    <a href="{{ team.wiki_page }}" target="_blank">{{ team.wiki_page }}</a>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h3>Team Members</h3>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Role</th>
+                        <th>Email</th>
+                        <th>Skills</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in team.members.all %}
+                        <tr>
+                            <td>{{ member.full_name }}</td>
+                            <td>{{ member.role }}</td>
+                            <td>{{ member.email }}</td>
+                            <td>{{ member.skills }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4">No team members have been added yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h3>Dependencies</h3>
+            <p><strong>Upstream Dependencies:</strong> {{ team.upstream_dependencies }}</p>
+            <p><strong>Downstream Dependencies:</strong> {{ team.downstream_dependencies }}</p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h1>Organisation</h1>
+    <p>Visualise a team with its upstream and downstream dependencies.</p>
+
+    <form method="get" class="mb-4">
+        <label for="team" class="form-label"><strong>Select a team</strong></label>
+        <select name="team" id="team" class="form-control" onchange="this.form.submit()">
+            <option value="">Choose a team...</option>
+
+            {% for team in teams %}
+                <option value="{{ team.id }}" {% if selected_team and team.id == selected_team.id %}selected{% endif %}>
+                    {{ team.team_name }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if selected_team %}
+        <div class="text-center mt-5">
+
+            <h3>Upstream Dependencies</h3>
+
+            <div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
+                {% for team in upstream_teams %}
+                    <div class="card p-3" style="width: 250px;">
+                        <strong>{{ team.team_name }}</strong>
+                        <span>{{ team.department }}</span>
+                        <small>Manager: {{ team.team_leader }}</small>
+                    </div>
+                {% empty %}
+                    <p>No upstream teams found.</p>
+                {% endfor %}
+            </div>
+
+            <div style="font-size: 30px;">↓</div>
+
+            <div class="card bg-primary text-white p-4 mx-auto my-4" style="max-width: 350px;">
+                <h2>{{ selected_team.team_name }}</h2>
+                <p>{{ selected_team.department }}</p>
+                <p>Manager: {{ selected_team.team_leader }}</p>
+            </div>
+
+            <div style="font-size: 30px;">↓</div>
+
+            <h3>Downstream Dependencies</h3>
+
+            <div class="d-flex justify-content-center flex-wrap gap-3 mt-4">
+                {% for team in downstream_teams %}
+                    <div class="card p-3" style="width: 250px;">
+                        <strong>{{ team.team_name }}</strong>
+                        <span>{{ team.department }}</span>
+                        <small>Manager: {{ team.team_leader }}</small>
+                    </div>
+                {% empty %}
+                    <p>No downstream teams found.</p>
+                {% endfor %}
+            </div>
+
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
